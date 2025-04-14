@@ -6,6 +6,7 @@ typedef enum ccLogLevel{
     ccLogLevels_Trace,
     ccLogLevels_Debug,
     ccLogLevels_Info,
+    ccLogLevels_Warn,
     ccLogLevels_Error,
     ccLogLevels_Off
 }ccLogLevel_t;
@@ -16,10 +17,11 @@ char const* logLevelString[ccLogLevels_Off] __attribute__((weak)) = {
     "Trace",
     "Debug",
     "Info",
+    "Warn",
     "Error"
 };
 #else
-// idk man, maybe just let the build fail because logLevelString does not exist?
+// idk, maybe just let the build fail because logLevelString does not exist?
 #endif // __GNUC__
 
 void setLogLevel(ccLogLevel_t);

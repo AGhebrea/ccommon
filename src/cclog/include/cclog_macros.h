@@ -41,6 +41,14 @@
 #endif // __GNUC__
 #endif // ccLogInfo
 
+#ifndef ccLogWarn
+#ifdef __GNUC__
+#define ccLogWarn(str, ...) ccLog(ccLogLevels_Warn, __FILE__, __func__, str __VA_OPT__(,) __VA_ARGS__)
+#else
+#define ccLogWarn(str, ...) ccLog(ccLogLevels_Warn, "", "", str)
+#endif // __GNUC__
+#endif // ccLogInfo
+
 #ifndef ccLogError
 #ifdef __GNUC__
 #define ccLogError(str, ...) ccLog(ccLogLevels_Error, __FILE__, __func__, str __VA_OPT__(,) __VA_ARGS__)
