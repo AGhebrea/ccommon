@@ -20,7 +20,7 @@ void ccLog(ccLogLevel_t level, const char* file, const char* function, const cha
     int n = 0;
     bool freemem = false;
 
-    if(level < activeLogLevel)
+    if(!ccLog_isLogLevelActive(level))
         return;
 
     size = 0;
@@ -58,9 +58,16 @@ void ccLog(ccLogLevel_t level, const char* file, const char* function, const cha
     return;
 }
 
-void setLogLevel(ccLogLevel_t level)
+void ccLog_setLogLevel(ccLogLevel_t level)
 {
     if(level > ccLogLevels_Off || level < 0)
         level = ccLogLevels_Off;
     activeLogLevel = level;
+}
+
+int ccLog_isLogLevelActive(ccLogLevel_t level)
+{
+    if(level < activeLogLevel)
+        return 0;
+    return 1;
 }

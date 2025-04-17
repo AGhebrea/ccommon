@@ -5,7 +5,7 @@ int main()
 {
     int status = 0;
 
-    setLogLevel(ccLogLevels_Error);
+    ccLog_setLogLevel(ccLogLevels_Error);
     // setLogLevel(ccLogLevels_Trace);
     // setLogLevel(ccLogLevels_Off);
 

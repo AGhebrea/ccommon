@@ -24,5 +24,6 @@ char const* logLevelString[ccLogLevels_Off] __attribute__((weak)) = {
 // idk, maybe just let the build fail because logLevelString does not exist?
 #endif // __GNUC__
 
-void setLogLevel(ccLogLevel_t);
+int ccLog_isLogLevelActive(ccLogLevel_t level);
+void ccLog_setLogLevel(ccLogLevel_t level);
 void ccLog(ccLogLevel_t level, const char* file, const char* function, const char *fmt, ...);
