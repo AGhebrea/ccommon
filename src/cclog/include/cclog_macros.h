@@ -82,3 +82,5 @@ do{                                                 \
     }                                               \
 } while(0)
 #endif // expectExit
+
+#define ccLogNotImplemented ccLogError("Not implemented!");

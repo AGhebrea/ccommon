@@ -1,5 +1,6 @@
 #include "../src/cclog/include/cclog.h"
 #include "./include/test_ccstd.h"
+#include "./include/test_ccSet.h"
 
 int main()
 {
