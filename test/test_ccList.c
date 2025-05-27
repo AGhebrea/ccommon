@@ -6,8 +6,8 @@
 
 void printList(ccList_t* list, char* str)
 {
-    return;
-
+    return; 
+    
     ccListNode_t* tmp;
 
     printf("\n\n[%s]\n", str);
@@ -25,6 +25,35 @@ void printList(ccList_t* list, char* str)
     }
 }
 
+int ccstd_cclist_jointest(void)
+{
+    ccList_t* list_1;
+    ccList_t* list_2;
+    size_t data_arr_1[4] = {0xbeef0000, 0xbeef0001, 0xbeef0002, 0xbeef0003};
+    size_t data_arr_2[4] = {0xcafe0000, 0xcafe0001, 0xcafe0002, 0xcafe0003};
+    bool failed = false;
+
+    list_1 = ccList_ctor();
+    list_2 = ccList_ctor();
+
+    ccList_append(list_1, ccListNode_ctor(&data_arr_1[0], NULL));
+    ccList_append(list_1, ccListNode_ctor(&data_arr_1[1], NULL));
+    ccList_append(list_1, ccListNode_ctor(&data_arr_1[2], NULL));
+    ccList_append(list_1, ccListNode_ctor(&data_arr_1[3], NULL));
+
+    ccList_append(list_2, ccListNode_ctor(&data_arr_2[0], NULL));
+    ccList_append(list_2, ccListNode_ctor(&data_arr_2[1], NULL));
+    ccList_append(list_2, ccListNode_ctor(&data_arr_2[2], NULL));
+    ccList_append(list_2, ccListNode_ctor(&data_arr_2[3], NULL));
+    
+    ccList_join(list_1, list_2);
+
+    printList(list_1, "dbg");
+
+    ccList_dtor(list_1);
+
+    return failed;
+}
 
 int ccstd_cclist_smoketest(void)
 {
@@ -34,29 +63,29 @@ int ccstd_cclist_smoketest(void)
     size_t i = 0;
     bool failed = false;
 
-    newlist = ctor_ccList();
-    insert_ccList(newlist, 0, ctor_ccListNode(&data_arr[0], NULL));
+    newlist = ccList_ctor();
+    ccList_insert(newlist, 0, ccListNode_ctor(&data_arr[0], NULL));
     printList(newlist, "1");
     
-    insert_ccList(newlist, 0, ctor_ccListNode(&data_arr[1], NULL));
+    ccList_insert(newlist, 0, ccListNode_ctor(&data_arr[1], NULL));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 1, ctor_ccListNode(&data_arr[3], NULL));
+    ccList_insert(newlist, 1, ccListNode_ctor(&data_arr[3], NULL));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 1, ctor_ccListNode(&data_arr[2], NULL));
+    ccList_insert(newlist, 1, ccListNode_ctor(&data_arr[2], NULL));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 1, ctor_ccListNode(&data_arr[2], NULL));
+    ccList_insert(newlist, 1, ccListNode_ctor(&data_arr[2], NULL));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 9, ctor_ccListNode(&data_arr[2], NULL));
+    ccList_insert(newlist, 9, ccListNode_ctor(&data_arr[2], NULL));
     printList(newlist, "1");
 
-    delete_item_ccList(newlist, 10);
+    ccList_deleteItem(newlist, 10);
     printList(newlist, "1");
 
-    delete_item_ccList(newlist, 2);
+    ccList_deleteItem(newlist, 2);
     printList(newlist, "1");
 
     tmp = newlist->head;
@@ -84,7 +113,7 @@ int ccstd_cclist_smoketest(void)
         ++i;
     }
 
-    dtor_ccList(newlist);
+    ccList_dtor(newlist);
 
     return failed;
 }
@@ -125,32 +154,32 @@ int ccstd_cclist_dtor_test(void)
     ccList_t* newlist;
     bool failed = false;
 
-    newlist = ctor_ccList();
-    insert_ccList(newlist, 0, ctor_ccListNode((void*)ctor_test_data(), &dtor_test_data));
+    newlist = ccList_ctor();
+    ccList_insert(newlist, 0, ccListNode_ctor((void*)ctor_test_data(), &dtor_test_data));
     printList(newlist, "1");
     
-    insert_ccList(newlist, 0, ctor_ccListNode((void*)ctor_test_data(), &dtor_test_data));
+    ccList_insert(newlist, 0, ccListNode_ctor((void*)ctor_test_data(), &dtor_test_data));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 1, ctor_ccListNode((void*)ctor_test_data(), &dtor_test_data));
+    ccList_insert(newlist, 1, ccListNode_ctor((void*)ctor_test_data(), &dtor_test_data));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 1, ctor_ccListNode((void*)ctor_test_data(), &dtor_test_data));
+    ccList_insert(newlist, 1, ccListNode_ctor((void*)ctor_test_data(), &dtor_test_data));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 1, ctor_ccListNode((void*)ctor_test_data(), &dtor_test_data));
+    ccList_insert(newlist, 1, ccListNode_ctor((void*)ctor_test_data(), &dtor_test_data));
     printList(newlist, "1");
 
-    insert_ccList(newlist, 9, ctor_ccListNode((void*)ctor_test_data(), &dtor_test_data));
+    ccList_insert(newlist, 9, ccListNode_ctor((void*)ctor_test_data(), &dtor_test_data));
     printList(newlist, "1");
 
-    delete_item_ccList(newlist, 10);
+    ccList_deleteItem(newlist, 10);
     printList(newlist, "1");
 
-    delete_item_ccList(newlist, 2);
+    ccList_deleteItem(newlist, 2);
     printList(newlist, "1");
 
-    dtor_ccList(newlist);
+    ccList_dtor(newlist);
 
     return failed;
 }

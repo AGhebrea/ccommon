@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../src/ccstd/include/ccSet.h"
-#include "./include/test_ccSet.h"
+#include "../src/ccstd/include/ccRBTree.h"
+#include "./include/test_ccRBTree.h"
 #include "../src/cclog/include/cclog.h"
 
 int compareFn(void* a, void *b){
@@ -14,21 +14,21 @@ int compareFn(void* a, void *b){
     return 0;
 }
 
-int ccstd_ccset_smoketest(void)
+int ccstd_ccRBTree_smoketest(void)
 {
     #define ADD(val) tmp = malloc(sizeof(int));     \
         *tmp = val;                                 \
-        ccSet_insert(set, ccSetNode_ctor(tmp));
+        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp));
     #define DEL(val) tmp = malloc(sizeof(int));     \
         *tmp = val;                                 \
-        ccSet_remove(set, tmp);
+        ccRBTree_remove(set, tmp);
 
     int status = 0;
 
     ccLog_setLogLevel(ccLogLevels_Info);
 
     int *tmp = NULL;
-    ccSet_t* set = ccSet_ctor(NULL, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(NULL, &compareFn);
 
     ADD(11);
     ADD(2);
@@ -40,17 +40,17 @@ int ccstd_ccset_smoketest(void)
     ADD(15);
     ADD(4);
 
-    dbg_printSet(set);
+    // dbg_printSet(set);
 
     DEL(11);
-    dbg_printSet(set);
+    // dbg_printSet(set);
 
     DEL(14);
-    dbg_printSet(set);
+    // dbg_printSet(set);
 
     tmp = malloc(sizeof(int));
     *tmp = 15;
-    ccSetNode_t* found = ccSet_find(set, tmp);
+    ccRBTreeNode_t* found = ccRBTree_find(set, tmp);
 
     if(found && *(int*)found->item == 15){
         status = 0;

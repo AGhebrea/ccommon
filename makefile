@@ -46,3 +46,7 @@ ccstd:
 test:
 	gcc ${TEST_MAIN_FILE} ${TEST_FILES} ${BUILD_FILES} -o ${TEST_OUTPUT} ${TEST_FLAGS}
 	${TEST_OUTPUT}
+
+clean:
+	rm ./bin/lib*.a
+	rm ./test/bin/testrun

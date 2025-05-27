@@ -1,7 +1,7 @@
 #include "../cclog/include/cclog_macros.h"
 #include "./include/ccList.h"
 
-ccList_t* ctor_ccList(void)
+ccList_t* ccList_ctor(void)
 {
     ccList_t* newList;
     
@@ -14,17 +14,17 @@ ccList_t* ctor_ccList(void)
     return newList;
 }
 
-void dtor_ccList(ccList_t *list)
+void ccList_dtor(ccList_t *list)
 {
     while(list->size > 0){
-        delete_head_ccList(list);
+        ccList_deleteHead(list);
     }
     if(list != NULL){
         free(list);
     }
 }
 
-ccListNode_t* ctor_ccListNode(void* data, void (*dtor_data_fn)(void*))
+ccListNode_t* ccListNode_ctor(void* data, void (*dtor_data_fn)(void*))
 {
     ccListNode_t* newNode;
 
@@ -35,7 +35,7 @@ ccListNode_t* ctor_ccListNode(void* data, void (*dtor_data_fn)(void*))
     return newNode;
 }
 
-void dtor_ccListNode(ccListNode_t* node)
+void ccListNode_dtor(ccListNode_t* node)
 {
     if(node->dtor_data != NULL)
         node->dtor_data(node->data);
@@ -43,7 +43,7 @@ void dtor_ccListNode(ccListNode_t* node)
         free(node);
 }
 
-void append_ccList(ccList_t* list, ccListNode_t* node)
+void ccList_append(ccList_t* list, ccListNode_t* node)
 {
     node->next = NULL;
 
@@ -65,19 +65,19 @@ void append_ccList(ccList_t* list, ccListNode_t* node)
     return;
 }
 
-void insert_ccList(ccList_t* list, size_t index, ccListNode_t* node)
+void ccList_insert(ccList_t* list, size_t index, ccListNode_t* node)
 {
     ccListNode_t* tmp;
 
     if(index >= list->size - 1){
         ccLogDebug("index (%d) >= index of tail (%d); defaulting to append.", index, list->size - 1);
-        append_ccList(list, node);
+        ccList_append(list, node);
         return;
     }
 
     if(list->size == 0){
         ccLogDebug("index == 0; defaulting to prepend.");
-        prepend_ccList(list, node);
+        ccList_prepend(list, node);
         return;
     }
 
@@ -105,7 +105,7 @@ void insert_ccList(ccList_t* list, size_t index, ccListNode_t* node)
     return;
 }
 
-void prepend_ccList(ccList_t* list, ccListNode_t* node)
+void ccList_prepend(ccList_t* list, ccListNode_t* node)
 {
     node->next = NULL;
 
@@ -127,7 +127,7 @@ void prepend_ccList(ccList_t* list, ccListNode_t* node)
     return;
 }
 
-void* itemAt_ccList(ccList_t* list, size_t index)
+void* ccList_itemAt(ccList_t* list, size_t index)
 {
     ccListNode_t* tmp;
 
@@ -143,7 +143,7 @@ void* itemAt_ccList(ccList_t* list, size_t index)
     return tmp->data;
 }
 
-void delete_tail_ccList(ccList_t* list)
+void ccList_deleteTail(ccList_t* list)
 {
     ccListNode_t* tmp;
 
@@ -154,7 +154,7 @@ void delete_tail_ccList(ccList_t* list)
 
     switch(list->size){
     case 1:
-        dtor_ccListNode(list->tail);
+        ccListNode_dtor(list->tail);
         list->tail = NULL;
         break;
     default:
@@ -168,7 +168,7 @@ void delete_tail_ccList(ccList_t* list)
         tmp = list->tail->previous;
         tmp->next = NULL;
 
-        dtor_ccListNode(list->tail);
+        ccListNode_dtor(list->tail);
 
         list->tail = tmp;
 
@@ -179,14 +179,14 @@ void delete_tail_ccList(ccList_t* list)
     return;
 }
 
-void delete_item_ccList(ccList_t* list, size_t index)
+void ccList_deleteItem(ccList_t* list, size_t index)
 {
     ccListNode_t* tmp;
     ccListNode_t* target;
 
     if(index >= list->size - 1){
         ccLogDebug("index (%d) >= index of tail (%d); defaulting to delete tail.", index, list->size - 1);
-        delete_tail_ccList(list);
+        ccList_deleteTail(list);
         return;
     }
 
@@ -213,14 +213,14 @@ void delete_item_ccList(ccList_t* list, size_t index)
     tmp->next = target->next;
     target->next->previous = tmp;
 
-    dtor_ccListNode(target);
+    ccListNode_dtor(target);
 
     list->size--;
 
     return;
 }
 
-void delete_head_ccList(ccList_t* list)
+void ccList_deleteHead(ccList_t* list)
 {
     ccListNode_t* tmp;
 
@@ -233,7 +233,7 @@ void delete_head_ccList(ccList_t* list)
 
     switch(list->size){
     case 1:
-        dtor_ccListNode(list->head);
+        ccListNode_dtor(list->head);
         list->head = NULL;
         break;
     default:
@@ -243,7 +243,7 @@ void delete_head_ccList(ccList_t* list)
         tmp = list->head->next;
         tmp->previous = NULL;
 
-        dtor_ccListNode(list->head);
+        ccListNode_dtor(list->head);
         list->head = tmp;
 
         break;
@@ -252,4 +252,11 @@ void delete_head_ccList(ccList_t* list)
     list->size--;
 
     return;
+}
+
+void ccList_join(ccList_t* a, ccList_t* b)
+{
+    a->size += b->size;
+    a->tail->next = b->head;
+    b->head->previous = a->tail;
 }

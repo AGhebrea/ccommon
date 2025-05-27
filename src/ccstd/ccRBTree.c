@@ -1,11 +1,10 @@
 #include <stdlib.h>
-#include "./include/ccStack.h"
-#include "./include/ccSet.h"
+#include "./include/ccRBTree.h"
 #include "../cclog/include/cclog_macros.h"
 
-ccSet_t* ccSet_ctor(void (*dtor_data_fn)(void*), int (*compare_fn)(void*, void*))
+ccRBTree_t* ccRBTree_ctor(void (*dtor_data_fn)(void*), int (*compare_fn)(void*, void*))
 {
-    ccSet_t* set = malloc(sizeof(ccSet_t));
+    ccRBTree_t* set = malloc(sizeof(ccRBTree_t));
     set->dtor_data_fn = dtor_data_fn;
     set->compare_fn = compare_fn;
     set->head = NULL;
@@ -13,14 +12,14 @@ ccSet_t* ccSet_ctor(void (*dtor_data_fn)(void*), int (*compare_fn)(void*, void*)
     return set;
 }
 
-void ccSet_dtor(ccSet_t *set)
+void ccRBTree_dtor(ccRBTree_t *set)
 {
     ccLogNotImplemented;
 }
 
-ccSetNode_t* ccSetNode_ctor(void* data)
+ccRBTreeNode_t* ccRBTreeNode_ctor(void* data)
 {
-    ccSetNode_t* node = malloc(sizeof(ccSetNode_t));
+    ccRBTreeNode_t* node = malloc(sizeof(ccRBTreeNode_t));
     node->color = red;
     node->item = data;
     node->left = NULL;
@@ -30,14 +29,14 @@ ccSetNode_t* ccSetNode_ctor(void* data)
     return node;
 }
 
-void ccSetNode_dtor(ccSetNode_t* node)
+void ccRBTreeNode_dtor(ccRBTreeNode_t* node)
 {
     ccLogNotImplemented;
 }
 
-static void leftr(ccSet_t* set, ccSetNode_t* node)
+static void leftr(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccSetNode_t* other = node->right;
+    ccRBTreeNode_t* other = node->right;
     node->right = other->left;
     other->parent = node->parent;
     if(other->left != NULL)
@@ -55,9 +54,9 @@ static void leftr(ccSet_t* set, ccSetNode_t* node)
     other->left = node;
 }
 
-static void rightr(ccSet_t* set, ccSetNode_t* node)
+static void rightr(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccSetNode_t* other = node->left;
+    ccRBTreeNode_t* other = node->left;
     node->left = other->right;
     other->parent = node->parent;
     if(node->right != NULL)
@@ -75,7 +74,7 @@ static void rightr(ccSet_t* set, ccSetNode_t* node)
     other->right = node;
 }
 
-static void insert(ccSet_t* set, ccSetNode_t* node, ccSetNode_t* where)
+static void insert(ccRBTree_t* set, ccRBTreeNode_t* node, ccRBTreeNode_t* where)
 {
     if(set->head == NULL){
         set->head = node;
@@ -101,9 +100,9 @@ static void insert(ccSet_t* set, ccSetNode_t* node, ccSetNode_t* where)
     }
 }
 
-void insertRebalance(ccSet_t* set, ccSetNode_t* node)
+void insertRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccSetNode_t* other;
+    ccRBTreeNode_t* other;
     /* color is already red from constructor */
     while(node != set->head && node->parent->color == red){
         if(node->parent->parent == NULL){
@@ -146,15 +145,15 @@ void insertRebalance(ccSet_t* set, ccSetNode_t* node)
     }
 }
 
-void ccSet_insert(ccSet_t* set, ccSetNode_t* node)
+void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
     insert(set, node, NULL);
     insertRebalance(set, node);
 }
 
-ccSetNode_t* ccSet_find(ccSet_t* set, void* data)
+ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* data)
 {
-    ccSetNode_t* cursor = set->head;
+    ccRBTreeNode_t* cursor = set->head;
 
     while(1){
         if(cursor == NULL)
@@ -171,9 +170,9 @@ ccSetNode_t* ccSet_find(ccSet_t* set, void* data)
     }
 }
 
-static ccSetNode_t* treeMin(ccSetNode_t* tree)
+static ccRBTreeNode_t* treeMin(ccRBTreeNode_t* tree)
 {
-    ccSetNode_t* min = tree;
+    ccRBTreeNode_t* min = tree;
     while(min->left != NULL){
         min = min->left;
     }
@@ -181,7 +180,7 @@ static ccSetNode_t* treeMin(ccSetNode_t* tree)
     return min;
 }
 
-static void transplant(ccSet_t* set, ccSetNode_t* a, ccSetNode_t* b)
+static void transplant(ccRBTree_t* set, ccRBTreeNode_t* a, ccRBTreeNode_t* b)
 {
     if(a->parent == NULL){
         set->head = b;
@@ -193,9 +192,9 @@ static void transplant(ccSet_t* set, ccSetNode_t* a, ccSetNode_t* b)
     b->parent = a->parent;
 }
 
-static void deleteRebalance(ccSet_t* set, ccSetNode_t* node)
+static void deleteRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccSetNode_t* other = NULL;
+    ccRBTreeNode_t* other = NULL;
 
     while(node != set->head && node->color == black){
         if(node == node->parent->left){
@@ -253,12 +252,12 @@ static void deleteRebalance(ccSet_t* set, ccSetNode_t* node)
 }
 
 /* TODO: read about this more in detail */
-void ccSet_remove(ccSet_t* set, void* data)
+void ccRBTree_remove(ccRBTree_t* set, void* data)
 {
-    ccSetNode_t* node = ccSet_find(set, data);
-    ccSetNode_t* a = NULL;
-    ccSetNode_t* b = node;
-    ccSetcolor_t originalColor = node->color;
+    ccRBTreeNode_t* node = ccRBTree_find(set, data);
+    ccRBTreeNode_t* a = NULL;
+    ccRBTreeNode_t* b = node;
+    ccRBTreecolor_t originalColor = node->color;
 
     if(node->left == NULL){
         a = node->right;
@@ -284,7 +283,7 @@ void ccSet_remove(ccSet_t* set, void* data)
         deleteRebalance(set, a);
     }
 
-    ccSetNode_dtor(node);
+    ccRBTreeNode_dtor(node);
 }
 
 struct cust{
@@ -292,7 +291,7 @@ struct cust{
     char c;
 };
 
-void dbg_printSet1(struct cust* data, int* idx, ccSetNode_t* node)
+void dbg_printSet1(struct cust* data, int* idx, ccRBTreeNode_t* node)
 {
     if(node->left == NULL && node->right == NULL){
         data[*idx].i = *(int*)(node->item);
@@ -320,9 +319,9 @@ void dbg_printSet1(struct cust* data, int* idx, ccSetNode_t* node)
     return;
 }
 
-void dbg_printSet(ccSet_t* set)
+void dbg_printSet(ccRBTree_t* set)
 {
-    ccSetNode_t* node = set->head;
+    ccRBTreeNode_t* node = set->head;
     struct cust data[100];
     int idx = 0;
     int* idxp = &idx;

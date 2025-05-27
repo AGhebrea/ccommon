@@ -15,16 +15,17 @@ typedef struct ccList{
     ccListNode_t *tail;
 }ccList_t;
 
-ccList_t* ctor_ccList(void);
-void dtor_ccList(ccList_t *list);
+ccList_t* ccList_ctor(void);
+void ccList_dtor(ccList_t *list);
 
-ccListNode_t* ctor_ccListNode(void* data, void (*dtor_data_fn)(void*));
-void dtor_ccListNode(ccListNode_t* node);
+ccListNode_t* ccListNode_ctor(void* data, void (*dtor_data_fn)(void*));
+void ccListNode_dtor(ccListNode_t* node);
 
-void append_ccList(ccList_t* list, ccListNode_t* node);
-void insert_ccList(ccList_t* list, size_t index, ccListNode_t* node);
-void prepend_ccList(ccList_t* list, ccListNode_t* node);
-void* itemAt_ccList(ccList_t* list, size_t index);
-void delete_tail_ccList(ccList_t* list);
-void delete_item_ccList(ccList_t* list, size_t index);
-void delete_head_ccList(ccList_t* list);
+void ccList_append(ccList_t* list, ccListNode_t* node);
+void ccList_insert(ccList_t* list, size_t index, ccListNode_t* node);
+void ccList_prepend(ccList_t* list, ccListNode_t* node);
+void* ccList_itemAt(ccList_t* list, size_t index);
+void ccList_deleteTail(ccList_t* list);
+void ccList_deleteItem(ccList_t* list, size_t index);
+void ccList_deleteHead(ccList_t* list);
+void ccList_join(ccList_t* a, ccList_t* b);
