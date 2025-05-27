@@ -11,7 +11,7 @@ typedef enum ccLogLevel{
     ccLogLevels_Off
 }ccLogLevel_t;
 
-// weak attrib to avoid ODR violation
+// HACK: weak attrib to avoid ODR violation
 #ifdef __GNUC__
 char const* logLevelString[ccLogLevels_Off] __attribute__((weak)) = {
     "Trace",

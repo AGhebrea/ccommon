@@ -28,5 +28,6 @@ void ccSetNode_dtor(ccSetNode_t* node);
 
 void ccSet_insert(ccSet_t* set, ccSetNode_t* node);
 ccSetNode_t* ccSet_find(ccSet_t* set, void* data);
+void ccSet_remove(ccSet_t* set, void* data);
 
 void dbg_printSet(ccSet_t* set);

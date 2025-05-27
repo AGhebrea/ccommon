@@ -237,7 +237,6 @@ void delete_head_ccList(ccList_t* list)
         list->head = NULL;
         break;
     default:
-        // todo: same as above
         if(list->head->previous != NULL)
             ccLogError(": was somehow called on item which is not the head of the list.");
 

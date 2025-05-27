@@ -101,10 +101,9 @@ static void insert(ccSet_t* set, ccSetNode_t* node, ccSetNode_t* where)
     }
 }
 
-void ccSet_insert(ccSet_t* set, ccSetNode_t* node)
+void insertRebalance(ccSet_t* set, ccSetNode_t* node)
 {
     ccSetNode_t* other;
-    insert(set, node, NULL);
     /* color is already red from constructor */
     while(node != set->head && node->parent->color == red){
         if(node->parent->parent == NULL){
@@ -137,7 +136,6 @@ void ccSet_insert(ccSet_t* set, ccSetNode_t* node)
             }else{
                 if(node == node->parent->left){
                     node = node->parent;
-                    // do we swap leftr and rightr as well ?
                     rightr(set, node);
                 }
                 node->parent->color = black;
@@ -146,6 +144,12 @@ void ccSet_insert(ccSet_t* set, ccSetNode_t* node)
             }
         }
     }
+}
+
+void ccSet_insert(ccSet_t* set, ccSetNode_t* node)
+{
+    insert(set, node, NULL);
+    insertRebalance(set, node);
 }
 
 ccSetNode_t* ccSet_find(ccSet_t* set, void* data)
@@ -165,6 +169,122 @@ ccSetNode_t* ccSet_find(ccSet_t* set, void* data)
             }
         }
     }
+}
+
+static ccSetNode_t* treeMin(ccSetNode_t* tree)
+{
+    ccSetNode_t* min = tree;
+    while(min->left != NULL){
+        min = min->left;
+    }
+
+    return min;
+}
+
+static void transplant(ccSet_t* set, ccSetNode_t* a, ccSetNode_t* b)
+{
+    if(a->parent == NULL){
+        set->head = b;
+    }else if(a == a->parent->left){
+        a->parent->left = b;
+    }else{
+        a->parent->right = b;
+    }
+    b->parent = a->parent;
+}
+
+static void deleteRebalance(ccSet_t* set, ccSetNode_t* node)
+{
+    ccSetNode_t* other = NULL;
+
+    while(node != set->head && node->color == black){
+        if(node == node->parent->left){
+            other = node->parent->right;
+            if(other->color == red){
+                other->color = black;
+                node->parent->color = red;
+                leftr(set, node->parent);
+                other = node->parent->right;
+            }
+            if(other->left->color == black && other->right->color == black){
+                other->color = red;
+                node = node->parent;
+            }else{
+                if(other->right->color == black){
+                    other->left->color = black;
+                    other->color = red;
+                    rightr(set, other);
+                    other = node->parent->right;
+                }
+                other->color = node->parent->color;
+                node->parent->color = black;
+                other->right->color = black;
+                leftr(set, node->parent);
+                node = set->head;
+            }
+        }else{
+            other = node->parent->left;
+            if(other->color == red){
+                other->color = black;
+                node->parent->color = red;
+                rightr(set, node->parent);
+                other = node->parent->left;
+            }
+            if(other->right->color == black && other->left->color == black){
+                other->color = red;
+                node = node->parent;
+            }else{
+                if(other->left->color == black){
+                    other->right->color = black;
+                    other->color = red;
+                    leftr(set, other);
+                    other = node->parent->left;
+                }
+                other->color = node->parent->color;
+                node->parent->color = black;
+                other->left->color = black;
+                rightr(set, node->parent);
+                node = set->head;
+            }
+        }
+    }
+
+    node->color = black;
+}
+
+/* TODO: read about this more in detail */
+void ccSet_remove(ccSet_t* set, void* data)
+{
+    ccSetNode_t* node = ccSet_find(set, data);
+    ccSetNode_t* a = NULL;
+    ccSetNode_t* b = node;
+    ccSetcolor_t originalColor = node->color;
+
+    if(node->left == NULL){
+        a = node->right;
+        transplant(set, node, node->right);
+    }else if(node->right == NULL){
+        a = node->left;
+        transplant(set, node, node->left);
+    }else{
+        b = treeMin(node->right);
+        originalColor = b->color;
+        a = b;
+        if(b->parent != node){
+            transplant(set, b, b->right);
+            b->right = node->right;
+            b->right->parent = b;
+        }
+        transplant(set, node, b);
+        b->left = node->left;
+        b->left->parent = b;
+        b->color = node->color;
+    }
+    if(originalColor == black){
+        deleteRebalance(set, a);
+    }
+
+    ccSetNode_dtor(node);
 }
 
 struct cust{

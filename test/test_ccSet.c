@@ -18,7 +18,10 @@ int ccstd_ccset_smoketest(void)
 {
     #define ADD(val) tmp = malloc(sizeof(int));     \
         *tmp = val;                                 \
-        ccSet_insert(set, ccSetNode_ctor(tmp));     \
+        ccSet_insert(set, ccSetNode_ctor(tmp));
+    #define DEL(val) tmp = malloc(sizeof(int));     \
+        *tmp = val;                                 \
+        ccSet_remove(set, tmp);
 
     int status = 0;
 
@@ -37,7 +40,13 @@ int ccstd_ccset_smoketest(void)
     ADD(15);
     ADD(4);
 
-    // dbg_printSet(set);
+    dbg_printSet(set);
+
+    DEL(11);
+    dbg_printSet(set);
+
+    DEL(14);
+    dbg_printSet(set);
 
     tmp = malloc(sizeof(int));
     *tmp = 15;
@@ -50,6 +59,7 @@ int ccstd_ccset_smoketest(void)
     }
 
     #undef ADD
+    #undef DEL
 
     return status;
 }
