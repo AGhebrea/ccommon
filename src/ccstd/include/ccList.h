@@ -28,4 +28,5 @@ void* ccList_itemAt(ccList_t* list, size_t index);
 void ccList_deleteTail(ccList_t* list);
 void ccList_deleteItem(ccList_t* list, size_t index);
 void ccList_deleteHead(ccList_t* list);
+void ccList_delete(ccList_t* list, ccListNode_t* node);
 void ccList_join(ccList_t* a, ccList_t* b);

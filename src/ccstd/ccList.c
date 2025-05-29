@@ -1,6 +1,9 @@
 #include "../cclog/include/cclog_macros.h"
 #include "./include/ccList.h"
 
+/* TODO: to do copy constructors we need to make the user specify a function to copy data.
+ * at this point we should just use c++ */
+
 ccList_t* ccList_ctor(void)
 {
     ccList_t* newList;
@@ -254,9 +257,28 @@ void ccList_deleteHead(ccList_t* list)
     return;
 }
 
+void ccList_delete(ccList_t* list, ccListNode_t* node)
+{
+    if(list->size == 0)
+        return;
+
+    if(node->previous != NULL){
+        node->previous->next = node->next;
+    }
+    if(node->next != NULL){
+        node->next->previous = node->previous;
+    }
+
+    node->previous = NULL;
+    node->next = NULL;
+
+    list->size -= 1;
+}
+
 void ccList_join(ccList_t* a, ccList_t* b)
 {
     a->size += b->size;
     a->tail->next = b->head;
     b->head->previous = a->tail;
+    a->tail = b->tail;
 }
