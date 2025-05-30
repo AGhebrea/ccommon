@@ -5,6 +5,7 @@
 #include "./include/test_ccStack.h"
 #include "./include/test_ccRBTree.h"
 #include "./include/test_ccDSU.h"
+#include "./include/test_ccDynamicArray.h"
 
 int test_ccstd_main(void)
 {
@@ -16,6 +17,7 @@ int test_ccstd_main(void)
     val |= ccstd_ccstack_smoketest();
     val |= ccstd_ccRBTree_smoketest();
     val |= ccstd_ccDSU_smoketest();
+    val |= ccstd_ccDynamicArray_smoketest();
 
     return val;
 }

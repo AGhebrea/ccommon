@@ -2,7 +2,7 @@
 
 int ccstd_ccDSU_smoketest()
 {
-    ccLogError("sslslslslslslslls");
+    ccLogTrace();
 
     return 0;
 }
