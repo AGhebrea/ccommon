@@ -28,9 +28,7 @@ void ccList_dtor(ccList_t *list)
     while(list->size > 0){
         ccList_deleteHead(list);
     }
-    if(list != NULL){
-        free(list);
-    }
+    free(list);
 }
 
 ccListNode_t* ccListNode_ctor(void* data, void (*dtor_data_fn)(void*))
@@ -48,8 +46,7 @@ void ccListNode_dtor(ccListNode_t* node)
 {
     if(node->dtor_data != NULL)
         node->dtor_data(node->data);
-    if(node != NULL)
-        free(node);
+    free(node);
 }
 
 void ccList_append(ccList_t* list, ccListNode_t* node)
@@ -300,9 +297,13 @@ void ccList_delete(ccList_t* list, ccListNode_t* node)
 
     if(node->previous != NULL){
         node->previous->next = node->next;
+    }else{
+        list->head = node->next;
     }
     if(node->next != NULL){
         node->next->previous = node->previous;
+    }else{
+        list->tail = node->previous;
     }
 
     node->previous = NULL;
