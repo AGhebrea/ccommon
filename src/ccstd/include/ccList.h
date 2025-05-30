@@ -13,6 +13,8 @@ typedef struct ccList{
     size_t size;
     ccListNode_t *head;
     ccListNode_t *tail;
+    ccListNode_t* last;
+    size_t lastIndex;
 }ccList_t;
 
 ccList_t* ccList_ctor(void);

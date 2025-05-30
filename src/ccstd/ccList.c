@@ -13,6 +13,12 @@ ccList_t* ccList_ctor(void)
     newList->size = 0;
     newList->head = NULL;
     newList->tail = NULL;
+    /* TODO: optimize a bit more the cache mechanism, at the moment we just
+     * invalidate cache on each operation that changes list, we could be 
+     * smarter about it but we also need to check if the optimization is
+     * worth the added code complexity. */
+    newList->last = NULL;
+    newList->lastIndex = 0;
 
     return newList;
 }
@@ -50,6 +56,8 @@ void ccList_append(ccList_t* list, ccListNode_t* node)
 {
     node->next = NULL;
 
+    list->last = NULL;
+
     switch(list->size){
     case 0:
         list->head = node;
@@ -71,6 +79,8 @@ void ccList_append(ccList_t* list, ccListNode_t* node)
 void ccList_insert(ccList_t* list, size_t index, ccListNode_t* node)
 {
     ccListNode_t* tmp;
+
+    list->last = NULL;
 
     if(index >= list->size - 1){
         ccLogDebug("index (%d) >= index of tail (%d); defaulting to append.", index, list->size - 1);
@@ -112,6 +122,8 @@ void ccList_prepend(ccList_t* list, ccListNode_t* node)
 {
     node->next = NULL;
 
+    list->last = NULL;
+
     switch(list->size){
     case 0:
         list->head = node;
@@ -132,16 +144,32 @@ void ccList_prepend(ccList_t* list, ccListNode_t* node)
 
 void* ccList_itemAt(ccList_t* list, size_t index)
 {
-    ccListNode_t* tmp;
+    ccListNode_t* tmp = NULL;
 
     if(index > list->size){
         ccLogDebug("index (%ld) > list->size (%ld), returning tail element.");
         return list->tail->data;
     }
 
-    tmp = list->head;
-    for(size_t i = 0; i < index; ++i)
-        tmp = tmp->next;
+    if(list->last != NULL){
+        if(list->lastIndex == index){
+            tmp = list->last;
+        }else if(list->lastIndex == index + 1){
+            tmp = list->last->next;
+            list->last = tmp;
+            list->lastIndex = index;
+        }else if(list->lastIndex == index - 1){
+            tmp = list->last->previous;
+            list->last = tmp;
+            list->lastIndex = index;
+        }
+    }
+
+    if(tmp == NULL){
+        tmp = list->head;
+        for(size_t i = 0; i < index; ++i)
+            tmp = tmp->next;
+    }
 
     return tmp->data;
 }
@@ -149,6 +177,8 @@ void* ccList_itemAt(ccList_t* list, size_t index)
 void ccList_deleteTail(ccList_t* list)
 {
     ccListNode_t* tmp;
+
+    list->last = NULL;
 
     if(list->size == 0){
         ccLogDebug("Tried to delete when size of list was 0! Nothing was done.");
@@ -186,6 +216,8 @@ void ccList_deleteItem(ccList_t* list, size_t index)
 {
     ccListNode_t* tmp;
     ccListNode_t* target;
+
+    list->last = NULL;
 
     if(index >= list->size - 1){
         ccLogDebug("index (%d) >= index of tail (%d); defaulting to delete tail.", index, list->size - 1);
@@ -229,6 +261,8 @@ void ccList_deleteHead(ccList_t* list)
 
     ccLogTrace();
 
+    list->last = NULL;
+
     if(list->size == 0){
         ccLogDebug("Tried to delete when size of list was 0! Nothing was done.");
         return;
@@ -262,6 +296,8 @@ void ccList_delete(ccList_t* list, ccListNode_t* node)
     if(list->size == 0)
         return;
 
+    list->last = NULL;
+
     if(node->previous != NULL){
         node->previous->next = node->next;
     }
@@ -281,4 +317,6 @@ void ccList_join(ccList_t* a, ccList_t* b)
     a->tail->next = b->head;
     b->head->previous = a->tail;
     a->tail = b->tail;
+    b->last = NULL;
+    a->last = NULL;
 }
