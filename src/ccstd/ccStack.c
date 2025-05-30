@@ -23,10 +23,7 @@ void dtor_ccStack(ccStack_t* ccStack)
         }
     }
 
-    if(ccStack->data != NULL){
-        free(ccStack->data);
-    }
-
+    free(ccStack->data);
     free(ccStack);
 
     return;

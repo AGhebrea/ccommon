@@ -51,7 +51,7 @@ void ccLog(ccLogLevel_t level, const char* file, const char* function, const cha
         fprintf(stdout, "[%s] %s\n", logLevelString[level], p);
     }
    
-    if (freemem && p != NULL) {
+    if (freemem) {
         free(p);
     }
 
