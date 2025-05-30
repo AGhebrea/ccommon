@@ -64,6 +64,9 @@ int ccstd_cclist_smoketest(void)
     bool failed = false;
 
     newlist = ccList_ctor();
+
+    ccList_itemAt(newlist, 0);
+
     ccList_insert(newlist, 0, ccListNode_ctor(&data_arr[0], NULL));
     printList(newlist, "1");
     

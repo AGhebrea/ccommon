@@ -139,9 +139,12 @@ void ccList_prepend(ccList_t* list, ccListNode_t* node)
     return;
 }
 
-void* ccList_itemAt(ccList_t* list, size_t index)
+ccListNode_t* ccList_nodeAt(ccList_t* list, size_t index)
 {
     ccListNode_t* tmp = NULL;
+
+    if(list->size == 0)
+        return NULL;
 
     if(index > list->size){
         ccLogDebug("index (%ld) > list->size (%ld), returning tail element.");
@@ -168,7 +171,16 @@ void* ccList_itemAt(ccList_t* list, size_t index)
             tmp = tmp->next;
     }
 
-    return tmp->data;
+    return tmp;
+}
+
+void* ccList_itemAt(ccList_t* list, size_t index)
+{
+    ccListNode_t* node = ccList_nodeAt(list, index);
+
+    if(node == NULL)
+        return NULL;
+    return node->data;
 }
 
 void ccList_deleteTail(ccList_t* list)
@@ -288,7 +300,7 @@ void ccList_deleteHead(ccList_t* list)
     return;
 }
 
-void ccList_delete(ccList_t* list, ccListNode_t* node)
+void ccList_unlink(ccList_t* list, ccListNode_t* node)
 {
     if(list->size == 0)
         return;
