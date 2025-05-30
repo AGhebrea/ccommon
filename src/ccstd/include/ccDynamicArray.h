@@ -8,7 +8,7 @@ typedef struct ccDynamicArray{
     void* data;
 }ccDynamicArray_t;
 
-ccDynamicArray_t* ccDynamicArray_ctor(size_t itemSize);
+ccDynamicArray_t* ccDynamicArray_ctor(size_t itemSize, bool zeroMem);
 void ccDynamicArray_dtor(ccDynamicArray_t* array);
 
 void* ccDynamicArray_get(ccDynamicArray_t* array, size_t index);

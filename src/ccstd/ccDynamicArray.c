@@ -1,17 +1,21 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "./include/ccDynamicArray.h"
 #include "../cclog/include/cclog_macros.h"
 
-ccDynamicArray_t* ccDynamicArray_ctor(size_t itemSize)
+ccDynamicArray_t* ccDynamicArray_ctor(size_t itemSize, bool zeroMem)
 {
     ccDynamicArray_t* newArray = NULL;
 
     expectExit(newArray, malloc(sizeof(ccDynamicArray_t)), != NULL);
     newArray->itemSize = itemSize;
     newArray->capacity = 4096;
-    expectExit(newArray->data, malloc(newArray->capacity * sizeof(char)), != NULL);
+    if(zeroMem)
+        expectExit(newArray->data, calloc(newArray->capacity,  sizeof(char)), != NULL);
+    else
+        expectExit(newArray->data, malloc(newArray->capacity * sizeof(char)), != NULL);
 
     return newArray;
 }

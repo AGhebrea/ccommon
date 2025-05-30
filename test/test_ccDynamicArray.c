@@ -7,7 +7,7 @@ int ccstd_ccDynamicArray_smoketest()
 
     size_t tmp = 0;
 
-    ccDynamicArray_t* array = ccDynamicArray_ctor(sizeof(size_t));
+    ccDynamicArray_t* array = ccDynamicArray_ctor(sizeof(size_t), 0);
     for(size_t i = 0; i < 4096 * 4; ++i)
         ccDynamicArray_set(array, i, &i);
 
