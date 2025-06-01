@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 typedef struct ccDynamicArray{
+    size_t size;
     size_t capacity;
     size_t itemSize;
     void* data;

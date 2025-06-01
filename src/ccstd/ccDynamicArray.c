@@ -12,6 +12,7 @@ ccDynamicArray_t* ccDynamicArray_ctor(size_t itemSize, bool zeroMem)
     expectExit(newArray, malloc(sizeof(ccDynamicArray_t)), != NULL);
     newArray->itemSize = itemSize;
     newArray->capacity = 4096;
+    newArray->size = 0;
     if(zeroMem)
         expectExit(newArray->data, calloc(newArray->capacity,  sizeof(char)), != NULL);
     else
@@ -39,6 +40,8 @@ void ccDynamicArray_set(ccDynamicArray_t* array, size_t index, void* data)
     void* aux = NULL;
     size_t i = index * array->itemSize;
 
+    if(index >= array->size)
+        array->size = index + 1;
     while(i >= array->capacity){
         array->capacity = array->capacity * 2;
         if(i < array->capacity){

@@ -154,14 +154,10 @@ ccListNode_t* ccList_nodeAt(ccList_t* list, size_t index)
     if(list->last != NULL){
         if(list->lastIndex == index){
             tmp = list->last;
-        }else if(list->lastIndex == index + 1){
-            tmp = list->last->next;
-            list->last = tmp;
-            list->lastIndex = index;
         }else if(list->lastIndex == index - 1){
+            tmp = list->last->next;
+        }else if(list->lastIndex == index + 1){
             tmp = list->last->previous;
-            list->last = tmp;
-            list->lastIndex = index;
         }
     }
 
@@ -170,6 +166,9 @@ ccListNode_t* ccList_nodeAt(ccList_t* list, size_t index)
         for(size_t i = 0; i < index; ++i)
             tmp = tmp->next;
     }
+
+    list->last = tmp;
+    list->lastIndex = index;
 
     return tmp;
 }
