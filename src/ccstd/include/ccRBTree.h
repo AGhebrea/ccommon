@@ -29,5 +29,3 @@ void ccRBTreeNode_dtor(ccRBTreeNode_t* node);
 void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node);
 ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* data);
 void ccRBTree_remove(ccRBTree_t* set, void* data);
-
-void dbg_printSet(ccRBTree_t* set);
