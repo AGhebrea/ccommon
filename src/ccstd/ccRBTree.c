@@ -2,6 +2,11 @@
 #include "./include/ccRBTree.h"
 #include "../cclog/include/cclog_macros.h"
 
+struct cust{
+    int i;
+    char c;
+};
+
 ccRBTree_t* ccRBTree_ctor(void (*dtor_data_fn)(void*), int (*compare_fn)(void*, void*))
 {
     ccRBTree_t* set = malloc(sizeof(ccRBTree_t));
@@ -284,4 +289,33 @@ void ccRBTree_remove(ccRBTree_t* set, void* data)
     }
 
     ccRBTreeNode_dtor(node);
+}
+
+void dbg_printSet1(int* idx, ccRBTreeNode_t* node, void (*printData)(void*))
+{
+    if(node->left == NULL && node->right == NULL){
+        printData(node);
+        return;
+    }
+
+    if(node->left != NULL)
+        dbg_printSet1(idx, node->left, printData);
+
+    printData(node);
+
+    if(node->right != NULL)
+        dbg_printSet1(idx, node->right, printData);
+
+    return;
+}
+
+void dbg_printSet(ccRBTree_t* set, void (*printData)(void*))
+{
+    ccRBTreeNode_t* node = set->head;
+    int idx = 0;
+    int* idxp = &idx;
+
+    dbg_printSet1(idxp, node, printData);
+
+    return;
 }
