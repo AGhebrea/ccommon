@@ -294,14 +294,14 @@ void ccRBTree_remove(ccRBTree_t* set, void* data)
 void dbg_printSet1(int* idx, ccRBTreeNode_t* node, void (*printData)(void*))
 {
     if(node->left == NULL && node->right == NULL){
-        printData(node);
+        printData(node->item);
         return;
     }
 
     if(node->left != NULL)
         dbg_printSet1(idx, node->left, printData);
 
-    printData(node);
+    printData(node->item);
 
     if(node->right != NULL)
         dbg_printSet1(idx, node->right, printData);
