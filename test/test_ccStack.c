@@ -10,11 +10,11 @@ int ccstd_ccstack_smoketest()
     size_t* tmp;
     size_t data[4] = {4, 3, 2, 1};
 
-    stack = ctor_ccStack(1024, NULL);
+    stack = ccStack_ctor(1024, NULL);
 
     for(size_t i = 0; i < 4; ++i){
-        push_ccStack(stack, &data[i]);
-        if(peek_ccStack(stack) != &data[i]){
+        ccStack_push(stack, &data[i]);
+        if(ccStack_peek(stack) != &data[i]){
             fail = 1;
             ccLogError("Peek stack is incorrect for index %ld!", i);
             return fail;
@@ -22,7 +22,7 @@ int ccstd_ccstack_smoketest()
     }
 
     for(size_t i = 4; i > 0; --i){
-        tmp = (size_t*)pop_ccStack(stack);
+        tmp = (size_t*)ccStack_pop(stack);
         if(tmp != &data[i - 1]){
             fail = 1;
             ccLogError("Pop of stack is incorrect for index %ld!", i);
@@ -36,7 +36,7 @@ int ccstd_ccstack_smoketest()
         return fail;
     }
 
-    dtor_ccStack(stack);
+    ccStack_dtor(stack);
 
     return fail;
 }

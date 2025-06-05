@@ -9,9 +9,9 @@ typedef struct ccStack{
     void (*dtor_data_fn)(void*);
 }ccStack_t;
 
-ccStack_t* ctor_ccStack(size_t capacity, void (*dtor_data_fn)(void*));
-void dtor_ccStack(ccStack_t* ccStack);
+ccStack_t* ccStack_ctor(size_t capacity, void (*dtor_data_fn)(void*));
+void ccStack_dtor(ccStack_t* ccStack);
 
-void push_ccStack(ccStack_t* ccStack, void* data);
-void* pop_ccStack(ccStack_t* ccStack);
-void* peek_ccStack(ccStack_t* ccStack);
+void ccStack_push(ccStack_t* ccStack, void* data);
+void* ccStack_pop(ccStack_t* ccStack);
+void* ccStack_peek(ccStack_t* ccStack);
