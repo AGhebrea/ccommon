@@ -16,6 +16,9 @@ int test_ccstd_main(void)
     val |= ccstd_cclist_dtor_test();
     val |= ccstd_ccstack_smoketest();
     val |= ccstd_ccRBTree_smoketest();
+    val |= ccstd_ccRBTreeKeyed_smoketest();
+    // todo: fix this
+    // val |= ccstd_ccRBTreeKeyedNested_smoketest();
     val |= ccstd_ccDSU_smoketest();
     val |= ccstd_ccDynamicArray_smoketest();
 

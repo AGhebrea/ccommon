@@ -26,4 +26,5 @@ char const* logLevelString[ccLogLevels_Off] __attribute__((weak)) = {
 
 int ccLog_isLogLevelActive(ccLogLevel_t level);
 void ccLog_setLogLevel(ccLogLevel_t level);
+ccLogLevel_t ccLog_getActiveLogLevel();
 void ccLog(ccLogLevel_t level, const char* file, const char* function, const char *fmt, ...);

@@ -65,6 +65,11 @@ void ccLog_setLogLevel(ccLogLevel_t level)
     activeLogLevel = level;
 }
 
+ccLogLevel_t ccLog_getActiveLogLevel()
+{
+    return activeLogLevel;
+}
+
 int ccLog_isLogLevelActive(ccLogLevel_t level)
 {
     if(level < activeLogLevel)
