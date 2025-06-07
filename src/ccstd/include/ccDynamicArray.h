@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include "./ccstd.h"
+
 typedef struct ccDynamicArray{
     size_t size;
     size_t capacity;

@@ -19,7 +19,7 @@ int ccstd_ccRBTree_smoketest(void)
 {
     #define ADD(val) tmp = malloc(sizeof(int));             \
         *tmp = val;                                         \
-        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp, NULL));
+        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp, NULL, NULL, NULL));
     #define DEL(val) tmp = malloc(sizeof(int)); \
         *tmp = val;                             \
         ccRBTree_remove(set, tmp);
@@ -29,7 +29,7 @@ int ccstd_ccRBTree_smoketest(void)
     ccLog_setLogLevel(ccLogLevels_Info);
 
     int *tmp = NULL;
-    ccRBTree_t* set = ccRBTree_ctor(0, NULL, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(0, &compareFn);
 
     ADD(11);
     ADD(2);
@@ -78,7 +78,7 @@ int ccstd_ccRBTreeKeyed_smoketest()
         keytmp = malloc(sizeof(char));                          \
         *tmp = val;                                             \
         *keytmp = key;                                          \
-        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp, keytmp));
+        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp, keytmp, NULL, NULL));
     #define DEL(val) tmp = malloc(sizeof(int)); \
         *tmp = val;                             \
         ccRBTree_remove(set, tmp);
@@ -89,7 +89,7 @@ int ccstd_ccRBTreeKeyed_smoketest()
 
     int *tmp = NULL;
     char* keytmp = NULL;
-    ccRBTree_t* set = ccRBTree_ctor(1, NULL, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(1, &compareFn);
 
     ADD(11, 'a');
     ADD(2, 'b');
@@ -152,7 +152,7 @@ void addItem(ccRBTree_t* set, int data, char key)
         list = (ccList_t*)(auxnode->item);
     }else{
         list = ccList_ctor();
-        ccRBTree_insert(set, ccRBTreeNode_ctor(&list, keytmp)); 
+        ccRBTree_insert(set, ccRBTreeNode_ctor(&list, keytmp, NULL, NULL)); 
     }
     ccList_append(list, ccListNode_ctor(tmp, NULL));
     dbg_printSet(set, printNodeList);
@@ -170,7 +170,7 @@ int ccstd_ccRBTreeKeyedNested_smoketest()
 
     ccLog_setLogLevel(ccLogLevels_Debug);
 
-    ccRBTree_t* set = ccRBTree_ctor(1, NULL, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(1, &compareFn);
 
     addItem(set, 11, 'a');
     addItem(set, 2, 'b');

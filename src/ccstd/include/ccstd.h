@@ -1,4 +1,3 @@
 #pragma once
 
-#include "./ccList.h"
-#include "./ccStack.h"
+typedef void (*dtor_t)(void*);

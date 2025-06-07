@@ -1,5 +1,7 @@
 #pragma once 
 
+#include "./ccstd.h"
+
 typedef enum {
     black,
     red
@@ -10,6 +12,8 @@ struct ccRBTreeNode{
     ccRBTreecolor_t color;
     void* item;
     void* key;
+    void (*dtor_data_fn)(void*);
+    void (*dtor_key_fn)(void*);
     ccRBTreeNode_t* left;
     ccRBTreeNode_t* right;
     ccRBTreeNode_t* parent;
@@ -18,14 +22,13 @@ struct ccRBTreeNode{
 typedef struct ccRBTree{
     ccRBTreeNode_t* head;
     int (*compare_fn)(void*, void*);
-    void (*dtor_data_fn)(void*);
     int keyed;
 }ccRBTree_t;
 
-ccRBTree_t* ccRBTree_ctor(int keyed, void (*dtor_data_fn)(void*), int (*compare_fn)(void*, void*));
+ccRBTree_t* ccRBTree_ctor(int keyed, int (*compare_fn)(void*, void*));
 void ccRBTree_dtor(ccRBTree_t *set);
 
-ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key);
+ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key, void (*dtor_data_fn)(void*), void (*dtor_key_fn)(void*));
 void ccRBTreeNode_dtor(ccRBTreeNode_t* node);
 
 void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node);

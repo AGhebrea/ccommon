@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include "./include/ccRBTree.h"
 #include "../cclog/include/cclog_macros.h"
+#include "include/ccStack.h"
 
 int compareImpl(ccRBTree_t* set, ccRBTreeNode_t* node, void* data);
 int compareInsertImpl(ccRBTree_t* set, ccRBTreeNode_t* node, ccRBTreeNode_t* where);
 
-ccRBTree_t* ccRBTree_ctor(int keyed, void (*dtor_data_fn)(void*), int (*compare_fn)(void*, void*))
+ccRBTree_t* ccRBTree_ctor(int keyed, int (*compare_fn)(void*, void*))
 {
     ccRBTree_t* set = malloc(sizeof(ccRBTree_t));
-    set->dtor_data_fn = dtor_data_fn;
     set->compare_fn = compare_fn;
     set->head = NULL;
     set->keyed = keyed;
@@ -18,10 +18,26 @@ ccRBTree_t* ccRBTree_ctor(int keyed, void (*dtor_data_fn)(void*), int (*compare_
 
 void ccRBTree_dtor(ccRBTree_t *set)
 {
-    ccLogNotImplemented;
+    ccStack_t* stack = ccStack_ctor(512, NULL);
+    ccRBTreeNode_t* node;
+
+    ccStack_push(stack, set->head);
+    while(stack->size != 0){
+        node = ccStack_pop(stack);
+        if(node->left != NULL){
+            ccStack_push(stack, node->left);
+        }
+        if(node->right != NULL){
+            ccStack_push(stack, node->right);
+        }
+        ccRBTreeNode_dtor(node);
+    }
+
+    ccStack_dtor(stack);
+    free(set);
 }
 
-ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key)
+ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key, void (*dtor_data_fn)(void*), void (*dtor_key_fn)(void*))
 {
     ccRBTreeNode_t* node = malloc(sizeof(ccRBTreeNode_t));
     node->color = red;
@@ -30,13 +46,19 @@ ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key)
     node->left = NULL;
     node->right = NULL;
     node->parent = NULL;
+    node->dtor_data_fn = dtor_data_fn;
+    node->dtor_key_fn = dtor_key_fn;
 
     return node;
 }
 
 void ccRBTreeNode_dtor(ccRBTreeNode_t* node)
 {
-    ccLogNotImplemented;
+    if(node->dtor_data_fn != NULL)
+        node->dtor_data_fn(node->item);
+    if(node->dtor_key_fn != NULL)
+        node->dtor_key_fn(node->key);
+    free(node);
 }
 
 static void leftr(ccRBTree_t* set, ccRBTreeNode_t* node)
