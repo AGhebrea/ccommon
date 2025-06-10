@@ -1,11 +1,6 @@
 #include <stdlib.h>
 #include "./include/ccRBTree.h"
-#include "include/ccList.h"
 #include "include/ccStack.h"
-#include "../cclog/include/cclog.h"
-#include <math.h>
-
-// todo: add to test: red-black tree with n internal nodes has height at most 2*lg(n+1)
 
 int compareImpl(ccRBTree_t* set, ccRBTreeNode_t* node, void* data);
 int compareInsertImpl(ccRBTree_t* set, ccRBTreeNode_t* node, ccRBTreeNode_t* where);
