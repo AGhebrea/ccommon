@@ -33,7 +33,7 @@ void ccStack_push(ccStack_t* ccStack, void* data)
 {
     ccStack->size++;
     
-    if(ccStack->size == ccStack->capacity){
+    if(ccStack->size >= ccStack->capacity){
         ccStack->capacity *= 2;
         expect(ccStack->data, realloc(ccStack->data, sizeof(void**) * ccStack->capacity), != NULL);
     }
@@ -44,14 +44,13 @@ void ccStack_push(ccStack_t* ccStack, void* data)
 
 void* ccStack_pop(ccStack_t* ccStack)
 {
-    ccStack_t* ret;
+    void* ret;
 
-    if(ccStack->size == -1){
+    if(ccStack->size == 0)
         return NULL;
-    }else{
-        ret = ccStack->data[ccStack->size];
-        ccStack->size--;
-    }
+
+    ret = ccStack->data[ccStack->size];
+    ccStack->size--;
 
     return ret;
 }

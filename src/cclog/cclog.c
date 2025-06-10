@@ -18,7 +18,7 @@ void ccLog(ccLogLevel_t level, const char* file, const char* function, const cha
     char *p;
     va_list ap;
     int n = 0;
-    bool freemem = false;
+    bool free_mem = false;
 
     if(!ccLog_isLogLevelActive(level))
         return;
@@ -35,7 +35,7 @@ void ccLog(ccLogLevel_t level, const char* file, const char* function, const cha
     if(size > PRINTBUFFERLEN){
         if(!expect(p, malloc(size), != NULL))
             return;
-        freemem = true;
+        free_mem = true;
     }else{
         p = printBuffer;
     }
@@ -51,7 +51,7 @@ void ccLog(ccLogLevel_t level, const char* file, const char* function, const cha
         fprintf(stdout, "[%s] %s\n", logLevelString[level], p);
     }
    
-    if (freemem) {
+    if (free_mem) {
         free(p);
     }
 

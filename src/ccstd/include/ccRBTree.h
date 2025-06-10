@@ -10,8 +10,8 @@ typedef enum {
 typedef struct ccRBTreeNode ccRBTreeNode_t;
 struct ccRBTreeNode{
     ccRBTreecolor_t color;
-    void* item;
     void* key;
+    void* data;
     void (*dtor_data_fn)(void*);
     void (*dtor_key_fn)(void*);
     ccRBTreeNode_t* left;
@@ -21,19 +21,22 @@ struct ccRBTreeNode{
 
 typedef struct ccRBTree{
     ccRBTreeNode_t* head;
+    ccRBTreeNode_t* null;
     int (*compare_fn)(void*, void*);
-    int keyed;
+    size_t size;
 }ccRBTree_t;
 
-ccRBTree_t* ccRBTree_ctor(int keyed, int (*compare_fn)(void*, void*));
+ccRBTree_t* ccRBTree_ctor(int (*compare_fn)(void*, void*));
 void ccRBTree_dtor(ccRBTree_t *set);
 
 ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key, void (*dtor_data_fn)(void*), void (*dtor_key_fn)(void*));
 void ccRBTreeNode_dtor(ccRBTreeNode_t* node);
 
 void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node);
-ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* data);
-void ccRBTree_remove(ccRBTree_t* set, void* data);
+int ccRBTree_contains(ccRBTree_t* set, void* key);
+ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* key);
+void ccRBTree_remove(ccRBTree_t* set, void* key);
 int ccRBTree_isEmpty(ccRBTree_t* set);
+int ccRBTree_isLeaf(ccRBTree_t* set, ccRBTreeNode_t* node);
 
 void dbg_printSet(ccRBTree_t* set, void (*printData)(void*));

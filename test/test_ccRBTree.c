@@ -19,7 +19,7 @@ int ccstd_ccRBTree_smoketest(void)
 {
     #define ADD(val) tmp = malloc(sizeof(int));             \
         *tmp = val;                                         \
-        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp, NULL, NULL, NULL));
+        ccRBTree_insert(set, ccRBTreeNode_ctor(tmp, tmp, NULL, NULL));
     #define DEL(val) tmp = malloc(sizeof(int)); \
         *tmp = val;                             \
         ccRBTree_remove(set, tmp);
@@ -29,7 +29,7 @@ int ccstd_ccRBTree_smoketest(void)
     ccLog_setLogLevel(ccLogLevels_Info);
 
     int *tmp = NULL;
-    ccRBTree_t* set = ccRBTree_ctor(0, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(&compareFn);
 
     ADD(11);
     ADD(2);
@@ -53,7 +53,7 @@ int ccstd_ccRBTree_smoketest(void)
     *tmp = 15;
     ccRBTreeNode_t* found = ccRBTree_find(set, tmp);
 
-    if(found && *(int*)found->item == 15){
+    if(found && *(int*)found->key == 15){
         status = 0;
     }else{
         status = 1;
@@ -69,7 +69,7 @@ void printNode(void* data)
 {
     ccRBTreeNode_t* node = (ccRBTreeNode_t*)data;
     ccLogDebug("node->key: %c", *(char*)(node->key));
-    ccLogDebug("node->item: %d", *(int*)(node->item));
+    ccLogDebug("node->data: %d", *(int*)(node->data));
 }
 
 int ccstd_ccRBTreeKeyed_smoketest()
@@ -89,7 +89,7 @@ int ccstd_ccRBTreeKeyed_smoketest()
 
     int *tmp = NULL;
     char* keytmp = NULL;
-    ccRBTree_t* set = ccRBTree_ctor(1, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(&compareFn);
 
     ADD(11, 'a');
     ADD(2, 'b');
@@ -108,13 +108,11 @@ int ccstd_ccRBTreeKeyed_smoketest()
     *keytmp = 'a';
     ccRBTreeNode_t* found = ccRBTree_find(set, keytmp);
 
-    if(found && *(int*)found->item == 1){
+    if(found && *(int*)found->data == 8){
         status = 0;
     }else{
         status = 1;
     }
-
-    dbg_printSet(set, printNode);
 
     #undef ADD
     #undef DEL
@@ -124,7 +122,7 @@ int ccstd_ccRBTreeKeyed_smoketest()
 
 void printNodeList(void *data)
 {
-    ccList_t* list = *(ccList_t**)((ccRBTreeNode_t*)data)->item;
+    ccList_t* list = *(ccList_t**)((ccRBTreeNode_t*)data)->key;
     ccListNode_t* node = NULL;
 
     ccLogDebug("Link START");
@@ -149,7 +147,7 @@ void addItem(ccRBTree_t* set, int data, char key)
     ccList_t* list = NULL;
     auxnode = ccRBTree_find(set, keytmp);
     if(auxnode != NULL){
-        list = (ccList_t*)(auxnode->item);
+        list = (ccList_t*)(auxnode->key);
     }else{
         list = ccList_ctor();
         ccRBTree_insert(set, ccRBTreeNode_ctor(&list, keytmp, NULL, NULL)); 
@@ -170,7 +168,7 @@ int ccstd_ccRBTreeKeyedNested_smoketest()
 
     ccLog_setLogLevel(ccLogLevels_Debug);
 
-    ccRBTree_t* set = ccRBTree_ctor(1, &compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(&compareFn);
 
     addItem(set, 11, 'a');
     addItem(set, 2, 'b');
@@ -191,3 +189,90 @@ int ccstd_ccRBTreeKeyedNested_smoketest()
 
     return status;
 }
+
+// // todo: add these tests for rbtree
+// if(set->head->parent != set->null){
+//     ccLogError("set->head->parent != set->null");
+//     // exit(1);
+// }
+// double_t height = recurseHeight(set, set->head) - 1;
+// double_t lg = 2 * log2(set->size + 1);
+// if(height > lg){
+//     ccLogError("Height too great %lf, size: %ld, lg: %lf", height, set->size, lg);
+//     // exit(1);
+// }else{
+//     // ccLogError("Height: %lf, size: %ld, lg: %lf", height, set->size, lg);
+// }
+// if(recurseCheckFail(set, set->head) == 1)
+// {
+//     ccLogError("Tree is already corrupted");
+//     // exit(1);
+// }
+// ccList_t* list = ccList_ctor();
+// if(recurseCheckDuplicates(set, list, set->head) == 1)
+// {
+//     ccLogError("Tree has duplicates");
+//     // exit(1);
+// }
+// list = ccList_ctor();
+// void* a;
+// void* b;
+// for(size_t i = 0; i < list->size; ++i){
+//     for(size_t j = i + 1; j < list->size; ++j){
+//         a = ccList_nodeAt(list, i)->data;
+//         b = ccList_nodeAt(list, j)->data;
+//         if(a == b){
+//             ccLogError("We somehow pushed the same data twice");
+//             // exit(1);
+//         }
+//     }
+// }
+// int recurseCheckFail(ccRBTree_t* set, ccRBTreeNode_t* node)
+// {
+//     if(node == set->null)
+//         return 0;
+
+//     if(recurseCheckFail(set, node->left) == 1)
+//         return 1;
+
+//     // if((*(size_t*)((size_t)node - 8) & 1) != 0x1)
+//     //     return 1;
+
+//     return recurseCheckFail(set, node->right);
+// }
+
+// int recurseCheckDuplicates(ccRBTree_t* set, ccList_t* list, ccRBTreeNode_t* node)
+// {
+//     if(node == set->null)
+//         return 0;
+
+//     if(recurseCheckDuplicates(set, list, node->left) == 1)
+//         return 1;
+
+//     for(size_t i = 0; i < list->size; ++i){
+//         if(node == ccList_nodeAt(list, i)->data){
+//             return 1;
+//         }
+//     }
+
+//     ccList_append(list, ccListNode_ctor(node, NULL));
+
+//     return recurseCheckDuplicates(set, list, node->right);
+// }
+
+// double_t recurseHeight(ccRBTree_t *set, ccRBTreeNode_t* node)
+// {
+//     double_t left = 0;
+//     double_t right = 0;
+
+//     if(node == set->null)
+//         return 0;
+
+//     left = recurseHeight(set, node->left);
+//     right = recurseHeight(set, node->right);
+
+//     if(left > right)
+//         return left+1;
+
+//     return right+1;
+// }

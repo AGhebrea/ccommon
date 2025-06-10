@@ -10,13 +10,13 @@ OUTPUT=./bin/lib$@.a
 
 INSTALL_LIB_DIR:=/usr/lib/ccommon
 INSTALL_INCLUDE_DIR:=/usr/include/ccommon
-FLAGS:=-I./include -ggdb3 -Wall
+FLAGS:=-I./include -ggdb3 -Wall -lm
 
 TEST_MAIN_FILE:=./test/main.c
 TEST_FILES:=$(wildcard ./test/*.c)
 TEST_FILES:=$(filter-out ${TEST_MAIN_FILE}, $(TEST_FILES))
 TEST_OUTPUT:=./test/bin/testrun
-TEST_FLAGS:=-L./bin/ -I./test/include -lcclog -lccstd -Wall -ggdb3
+TEST_FLAGS:=-L./bin/ -I./test/include -lcclog -lccstd -Wall -ggdb3 -lm
 
 # idk
 define RULE_TEXT

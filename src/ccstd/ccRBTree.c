@@ -1,39 +1,52 @@
 #include <stdlib.h>
 #include "./include/ccRBTree.h"
-#include "../cclog/include/cclog_macros.h"
+#include "include/ccList.h"
 #include "include/ccStack.h"
+#include "../cclog/include/cclog.h"
+#include <math.h>
+
+// todo: add to test: red-black tree with n internal nodes has height at most 2*lg(n+1)
 
 int compareImpl(ccRBTree_t* set, ccRBTreeNode_t* node, void* data);
 int compareInsertImpl(ccRBTree_t* set, ccRBTreeNode_t* node, ccRBTreeNode_t* where);
+void insertRebalance(ccRBTree_t* set, ccRBTreeNode_t* node);
 
-ccRBTree_t* ccRBTree_ctor(int keyed, int (*compare_fn)(void*, void*))
+ccRBTree_t* ccRBTree_ctor(int (*compare_fn)(void*, void*))
 {
     ccRBTree_t* set = malloc(sizeof(ccRBTree_t));
+    set->null = ccRBTreeNode_ctor(NULL, NULL, NULL, NULL);
+    set->null->color = black;
     set->compare_fn = compare_fn;
-    set->head = NULL;
-    set->keyed = keyed;
+    set->head = set->null;
+    set->size = 0;
 
     return set;
 }
 
 void ccRBTree_dtor(ccRBTree_t *set)
 {
-    ccStack_t* stack = ccStack_ctor(512, NULL);
     ccRBTreeNode_t* node;
 
-    ccStack_push(stack, set->head);
+    if(set == NULL)
+        return;
+
+    ccStack_t* stack = ccStack_ctor(512, NULL);
+
+    if(set->head != NULL)
+        ccStack_push(stack, set->head);
     while(stack->size != 0){
         node = ccStack_pop(stack);
-        if(node->left != NULL){
+        if(!ccRBTree_isLeaf(set, node->left)){
             ccStack_push(stack, node->left);
         }
-        if(node->right != NULL){
+        if(!ccRBTree_isLeaf(set, node->right)){
             ccStack_push(stack, node->right);
         }
         ccRBTreeNode_dtor(node);
     }
 
     ccStack_dtor(stack);
+    ccRBTreeNode_dtor(set->null);
     free(set);
 }
 
@@ -41,8 +54,8 @@ ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key, void (*dtor_data_fn)(vo
 {
     ccRBTreeNode_t* node = malloc(sizeof(ccRBTreeNode_t));
     node->color = red;
-    node->item = data;
     node->key = key;
+    node->data = data;
     node->left = NULL;
     node->right = NULL;
     node->parent = NULL;
@@ -54,8 +67,10 @@ ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key, void (*dtor_data_fn)(vo
 
 void ccRBTreeNode_dtor(ccRBTreeNode_t* node)
 {
+    if(node == NULL)
+        return;
     if(node->dtor_data_fn != NULL)
-        node->dtor_data_fn(node->item);
+        node->dtor_data_fn(node->data);
     if(node->dtor_key_fn != NULL)
         node->dtor_key_fn(node->key);
     free(node);
@@ -64,81 +79,80 @@ void ccRBTreeNode_dtor(ccRBTreeNode_t* node)
 static void leftr(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
     ccRBTreeNode_t* other = node->right;
+
     node->right = other->left;
-    other->parent = node->parent;
-    if(other->left != NULL)
+    if(other->left != set->null)
         other->left->parent = node;
-    if(node->parent != NULL){
-        if(node->parent->left == node){
-            node->parent->left = other;
-        }else{
-            node->parent->right = other;
-        }
+    other->parent = node->parent;
+    if(node->parent == set->null){
+        set->head = other;
+    }else if(node == node->parent->left){
+        node->parent->left = other;
     }else{
-        set->head = node;
+        node->parent->right = other;
     }
-    node->parent = other;
     other->left = node;
+    node->parent = other;
 }
 
 static void rightr(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
     ccRBTreeNode_t* other = node->left;
+
     node->left = other->right;
+    if(other->right != set->null)
+        other->right->parent = node;
     other->parent = node->parent;
-    if(node->right != NULL)
-        node->right->parent = other;
-    if(node->parent != NULL){
-        if(node->parent->left == node){
-            node->parent->left = other;
-        }else{
-            node->parent->right = other;
-        }
+    if(node->parent == set->null){
+        set->head = other;
+    }else if(node == node->parent->right){
+        node->parent->right = other;
     }else{
-        set->head = node;
+        node->parent->left = other;
     }
-    node->parent = other;
     other->right = node;
+    node->parent = other;
 }
 
-static void insert(ccRBTree_t* set, ccRBTreeNode_t* node, ccRBTreeNode_t* where)
+void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    if(set->head == NULL){
+    ccRBTreeNode_t* other;
+    ccRBTreeNode_t* where;
+
+    set->size += 1;
+
+    where = set->null;
+    other = set->head;
+    while(other != set->null){
+        where = other;
+        if(set->compare_fn(node->key, other->key) >= 0){
+            other = other->right;
+        }else{
+            other = other->left;
+        }
+    }
+    node->parent = where;
+    if(where == set->null){
         set->head = node;
-        return;
-    }
-    if(where == NULL){
-        where = set->head;
-    }
-    if(compareInsertImpl(set, node, where) > 0){
-        if(where->right == NULL){
-            node->parent = where;
-            where->right = node;
-        }else{
-            insert(set, node, where->right);
-        }
+    }else if(set->compare_fn(node->key, where->key) >= 0){
+        where->right = node;
     }else{
-        if(where->left == NULL){
-            node->parent = where;
-            where->left = node;
-        }else{
-            insert(set, node, where->left);
-        }
+        where->left = node;
     }
+    node->left = set->null;
+    node->right = set->null;
+    node->color = red;
+    insertRebalance(set, node);
 }
 
 void insertRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
     ccRBTreeNode_t* other;
-    /* color is already red from constructor */
-    while(node != set->head && node->parent->color == red){
-        if(node->parent->parent == NULL){
-            node->color = black;
-            return;
-        }
+    
+    while(node->parent->color == red){
         if(node->parent == node->parent->parent->left){
             other = node->parent->parent->right;
-            if(other != NULL && other->color == red){
+            if(other->color == red){
                 node->parent->color = black;
                 other->color = black;
                 node->parent->parent->color = red;
@@ -154,7 +168,7 @@ void insertRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
             }
         }else{
             other = node->parent->parent->left;
-            if(other != NULL && other->color == red){
+            if(other->color == red){
                 node->parent->color = black;
                 other->color = black;
                 node->parent->parent->color = red;
@@ -170,23 +184,25 @@ void insertRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
             }
         }
     }
+    set->head->color = black;
 }
 
-void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node)
+int ccRBTree_contains(ccRBTree_t* set, void* key)
 {
-    insert(set, node, NULL);
-    insertRebalance(set, node);
+    if(ccRBTree_find(set, key) != NULL)
+        return 1;
+    return 0;
 }
 
-ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* data)
+ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* key)
 {
     ccRBTreeNode_t* cursor = set->head;
     int result = 0;
 
     while(1){
-        if(cursor == NULL)
+        if(cursor == set->null)
             return NULL;
-        result = compareImpl(set, cursor, data);
+        result = set->compare_fn(cursor->key, key);
         if(result == 0){
             return cursor;
         }else if(result > 0){
@@ -197,28 +213,12 @@ ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* data)
     }
 }
 
-int compareImpl(ccRBTree_t* set, ccRBTreeNode_t* node, void* data)
-{
-    if(set->keyed){
-        return set->compare_fn(node->key, data);
-    }
-
-    return set->compare_fn(node->item, data);
-}
-
-int compareInsertImpl(ccRBTree_t* set, ccRBTreeNode_t* node, ccRBTreeNode_t* where)
-{
-    if(set->keyed){
-        return set->compare_fn(node->key, where->key);
-    }
-
-    return set->compare_fn(node->item, where->item);
-}
-
-static ccRBTreeNode_t* treeMin(ccRBTreeNode_t* tree)
+static ccRBTreeNode_t* treeMin(ccRBTree_t* set, ccRBTreeNode_t* tree)
 {
     ccRBTreeNode_t* min = tree;
-    while(min->left != NULL){
+    if(tree == set->null)
+        return NULL;
+    while(min->left != set->null){
         min = min->left;
     }
 
@@ -227,20 +227,19 @@ static ccRBTreeNode_t* treeMin(ccRBTreeNode_t* tree)
 
 static void transplant(ccRBTree_t* set, ccRBTreeNode_t* a, ccRBTreeNode_t* b)
 {
-    if(a->parent == NULL){
+    if(a->parent == set->null){
         set->head = b;
     }else if(a == a->parent->left){
         a->parent->left = b;
     }else{
         a->parent->right = b;
     }
-    if(b != NULL)
-        b->parent = a->parent;
+    b->parent = a->parent;
 }
 
 static void deleteRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccRBTreeNode_t* other = NULL;
+    ccRBTreeNode_t* other;
 
     while(node != set->head && node->color == black){
         if(node == node->parent->left){
@@ -297,30 +296,39 @@ static void deleteRebalance(ccRBTree_t* set, ccRBTreeNode_t* node)
     node->color = black;
 }
 
-/* TODO: read about this more in detail */
-void ccRBTree_remove(ccRBTree_t* set, void* data)
+int ccRBTree_isLeaf(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccRBTreeNode_t* node = ccRBTree_find(set, data);
-    ccRBTreeNode_t* a = NULL;
-    ccRBTreeNode_t* b = node;
-    ccRBTreecolor_t originalColor;
+    if(node == set->null)
+        return 1;
+    return 0;
+}
+
+void ccRBTree_remove(ccRBTree_t* set, void* key)
+{
+    ccRBTreeNode_t* node = ccRBTree_find(set, key);
+    ccRBTreeNode_t* del = node;
+    ccRBTreeNode_t* a;
+    ccRBTreeNode_t* b;
+    ccRBTreecolor_t original;
 
     if(node == NULL)
         return;
 
-    originalColor = node->color;
-
-    if(node->left == NULL){
+    b = node;
+    original = b->color;
+    if(node->left == set->null){
         a = node->right;
         transplant(set, node, node->right);
-    }else if(node->right == NULL){
+    }else if(node->right == set->null){
         a = node->left;
         transplant(set, node, node->left);
     }else{
-        b = treeMin(node->right);
-        originalColor = b->color;
-        a = b;
-        if(b->parent != node){
+        b = treeMin(set, node->right);
+        original = b->color;
+        a = b->right;
+        if(b->parent == node){
+            a->parent = b;
+        }else{
             transplant(set, b, b->right);
             b->right = node->right;
             b->right->parent = b;
@@ -330,48 +338,32 @@ void ccRBTree_remove(ccRBTree_t* set, void* data)
         b->left->parent = b;
         b->color = node->color;
     }
-    if(originalColor == black){
-        deleteRebalance(set, a);
-    }
 
-    ccRBTreeNode_dtor(node);
+    if(original == black)
+        deleteRebalance(set, a);
+
+    ccRBTreeNode_dtor(del);
 }
 
 int ccRBTree_isEmpty(ccRBTree_t* set)
 {
-    if(set->head == NULL)
+    if(set->head == set->null)
         return 1;
     return 0;
 }
 
-void dbg_printSet1(int* idx, ccRBTreeNode_t* node, void (*printData)(void*))
+void dbg_printSet1(ccRBTree_t* set, int* idx, ccRBTreeNode_t* node, void (*printData)(void*))
 {
-    if(node == NULL)
+    if(node == set->null)
         return;
 
-    if(node->left != NULL)
-        dbg_printSet1(idx, node->left, printData);
-
-    printData(node->item);
-
-    if(node->right != NULL)
-        dbg_printSet1(idx, node->right, printData);
-
-    return;
-}
-
-void dbg_printSetKeyed1(int* idx, ccRBTreeNode_t* node, void (*printData)(void*))
-{
-    if(node == NULL)
-        return;
-
-    if(node->left != NULL)
-        dbg_printSetKeyed1(idx, node->left, printData);
+    if(node->left != set->null)
+        dbg_printSet1(set, idx, node->left, printData);
 
     printData(node);
 
-    if(node->right != NULL)
-        dbg_printSetKeyed1(idx, node->right, printData);
+    if(node->right != set->null)
+        dbg_printSet1(set, idx, node->right, printData);
 
     return;
 }
@@ -383,10 +375,7 @@ void dbg_printSet(ccRBTree_t* set, void (*printData)(void*))
     int idx = 0;
     int* idxp = &idx;
 
-    if(set->keyed)
-        dbg_printSetKeyed1(idxp, node, printData);
-    else
-        dbg_printSet1(idxp, node, printData);
+    dbg_printSet1(set, idxp, node, printData);
 
     return;
 }
