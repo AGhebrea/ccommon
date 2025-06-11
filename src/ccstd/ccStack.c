@@ -12,6 +12,8 @@ ccStack_t* ccStack_ctor(size_t capacity, void (*dtor_data_fn)(void*))
     ret->capacity = capacity;
     ret->dtor_data_fn = dtor_data_fn;
 
+    ccType_ctor(&ret->type, "ccStack_t");
+
     return ret;
 }
 

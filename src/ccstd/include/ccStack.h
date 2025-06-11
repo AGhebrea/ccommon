@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 typedef struct ccStack{
+    ccType_t type;
     size_t size;
     size_t capacity;
     void** data;

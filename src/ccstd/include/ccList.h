@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 typedef struct ccListNode{
+    ccType_t type;
     void* data;
     struct ccListNode* previous;
     struct ccListNode* next;
@@ -11,6 +12,7 @@ typedef struct ccListNode{
 }ccListNode_t;
 
 typedef struct ccList{
+    ccType_t type;
     size_t size;
     ccListNode_t *head;
     ccListNode_t *tail;

@@ -9,6 +9,7 @@ typedef enum {
 
 typedef struct ccRBTreeNode ccRBTreeNode_t;
 struct ccRBTreeNode{
+    ccType_t type;
     ccRBTreecolor_t color;
     void* key;
     void* data;
@@ -20,6 +21,7 @@ struct ccRBTreeNode{
 };
 
 typedef struct ccRBTree{
+    ccType_t type;
     ccRBTreeNode_t* head;
     ccRBTreeNode_t* null;
     int (*compare_fn)(void*, void*);
@@ -36,6 +38,7 @@ void ccRBTree_insert(ccRBTree_t* set, ccRBTreeNode_t* node);
 int ccRBTree_contains(ccRBTree_t* set, void* key);
 ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* key);
 void ccRBTree_remove(ccRBTree_t* set, void* key);
+void ccRBTree_removeNode(ccRBTree_t* set, ccRBTreeNode_t* node);
 int ccRBTree_isEmpty(ccRBTree_t* set);
 int ccRBTree_isLeaf(ccRBTree_t* set, ccRBTreeNode_t* node);
 

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "./include/ccDynamicArray.h"
 #include "../cclog/include/cclog_macros.h"
+#include "include/ccRuntime.h"
 
 static inline void ccDynamicArray_alloc(ccDynamicArray_t* array, size_t index);
 
@@ -20,6 +21,8 @@ ccDynamicArray_t* ccDynamicArray_ctor(size_t itemSize, bool zeroMem)
     else
         expectExit(newArray->data, malloc(newArray->capacity * sizeof(char)), != NULL);
     newArray->zeroMem = zeroMem;
+
+    ccType_ctor(&newArray->type, "ccDynamicArray_t");
 
     return newArray;
 }

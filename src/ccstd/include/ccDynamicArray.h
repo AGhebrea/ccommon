@@ -4,8 +4,10 @@
 #include <stdbool.h>
 
 #include "./ccstd.h"
+#include "ccRuntime.h"
 
 typedef struct ccDynamicArray{
+    ccType_t type;
     size_t size;
     size_t capacity;
     size_t itemSize;

@@ -20,6 +20,8 @@ ccList_t* ccList_ctor(void)
     newList->last = NULL;
     newList->lastIndex = 0;
 
+    ccType_ctor(&newList->type, "ccList_t");
+
     return newList;
 }
 
@@ -38,6 +40,8 @@ ccListNode_t* ccListNode_ctor(void* data, void (*dtor_data_fn)(void*))
     expect(newNode, malloc(sizeof(ccListNode_t)), != NULL);
     newNode->data = data;
     newNode->dtor_data = dtor_data_fn;
+
+    ccType_ctor(&newNode->type, "ccListNode_t");
 
     return newNode;
 }

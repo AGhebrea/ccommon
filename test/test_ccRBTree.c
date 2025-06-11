@@ -15,6 +15,13 @@ int compareFn(void* a, void *b){
     return 0;
 }
 
+int compareCharFn(void* a, void *b){
+    char A = *(char*)a;
+    char B = *(char*)b;
+
+    return A-B;
+}
+
 int ccstd_ccRBTree_smoketest(void)
 {
     #define ADD(val) tmp = malloc(sizeof(int));             \
@@ -41,13 +48,8 @@ int ccstd_ccRBTree_smoketest(void)
     ADD(15);
     ADD(4);
 
-    // dbg_printSet(set);
-
     DEL(11);
-    // dbg_printSet(set);
-
     DEL(14);
-    // dbg_printSet(set);
 
     tmp = malloc(sizeof(int));
     *tmp = 15;
@@ -85,11 +87,11 @@ int ccstd_ccRBTreeKeyed_smoketest()
 
     int status = 0;
 
-    ccLog_setLogLevel(ccLogLevels_Info);
+    ccLog_setLogLevel(ccLogLevels_Debug);
 
     int *tmp = NULL;
     char* keytmp = NULL;
-    ccRBTree_t* set = ccRBTree_ctor(&compareFn);
+    ccRBTree_t* set = ccRBTree_ctor(&compareCharFn);
 
     ADD(11, 'a');
     ADD(2, 'b');

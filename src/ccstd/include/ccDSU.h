@@ -3,6 +3,7 @@
 #include "./ccstd.h"
 
 typedef struct dsu{
+    ccType_t type;
     long* items;
     void* data;
     void (*dtor_data_fn)(void*);

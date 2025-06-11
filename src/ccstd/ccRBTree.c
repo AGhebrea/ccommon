@@ -15,6 +15,8 @@ ccRBTree_t* ccRBTree_ctor(int (*compare_fn)(void*, void*))
     set->head = set->null;
     set->size = 0;
 
+    ccType_ctor(&set->type, "ccRBTree_t");
+
     return set;
 }
 
@@ -27,7 +29,7 @@ void ccRBTree_dtor(ccRBTree_t *set)
 
     ccStack_t* stack = ccStack_ctor(512, NULL);
 
-    if(set->head != NULL)
+    if(!ccRBTree_isLeaf(set, set->head))
         ccStack_push(stack, set->head);
     while(stack->size != 0){
         node = ccStack_pop(stack);
@@ -56,6 +58,8 @@ ccRBTreeNode_t* ccRBTreeNode_ctor(void* data, void* key, void (*dtor_data_fn)(vo
     node->parent = NULL;
     node->dtor_data_fn = dtor_data_fn;
     node->dtor_key_fn = dtor_key_fn;
+
+    ccType_ctor(&node->type, "ccRBTreeNode_t");
 
     return node;
 }
@@ -197,13 +201,13 @@ ccRBTreeNode_t* ccRBTree_find(ccRBTree_t* set, void* key)
     while(1){
         if(cursor == set->null)
             return NULL;
-        result = set->compare_fn(cursor->key, key);
+        result = set->compare_fn(key, cursor->key);
         if(result == 0){
             return cursor;
         }else if(result > 0){
-                cursor = cursor->left;
-        }else{
             cursor = cursor->right;
+        }else{
+            cursor = cursor->left;
         }
     }
 }
@@ -298,10 +302,8 @@ int ccRBTree_isLeaf(ccRBTree_t* set, ccRBTreeNode_t* node)
     return 0;
 }
 
-void ccRBTree_remove(ccRBTree_t* set, void* key)
+void ccRBTree_removeNode(ccRBTree_t* set, ccRBTreeNode_t* node)
 {
-    ccRBTreeNode_t* node = ccRBTree_find(set, key);
-    ccRBTreeNode_t* del = node;
     ccRBTreeNode_t* a;
     ccRBTreeNode_t* b;
     ccRBTreecolor_t original;
@@ -336,8 +338,12 @@ void ccRBTree_remove(ccRBTree_t* set, void* key)
 
     if(original == black)
         deleteRebalance(set, a);
+}
 
-    ccRBTreeNode_dtor(del);
+void ccRBTree_remove(ccRBTree_t* set, void* key)
+{
+    ccRBTreeNode_t* node = ccRBTree_find(set, key);
+    ccRBTree_removeNode(set, node);
 }
 
 int ccRBTree_isEmpty(ccRBTree_t* set)
@@ -347,18 +353,18 @@ int ccRBTree_isEmpty(ccRBTree_t* set)
     return 0;
 }
 
-void dbg_printSet1(ccRBTree_t* set, int* idx, ccRBTreeNode_t* node, void (*printData)(void*))
+void dbg_printSet1(ccRBTree_t* set, ccRBTreeNode_t* node, void (*printData)(void*))
 {
     if(node == set->null)
         return;
 
     if(node->left != set->null)
-        dbg_printSet1(set, idx, node->left, printData);
+        dbg_printSet1(set, node->left, printData);
 
     printData(node);
 
     if(node->right != set->null)
-        dbg_printSet1(set, idx, node->right, printData);
+        dbg_printSet1(set, node->right, printData);
 
     return;
 }
@@ -367,10 +373,8 @@ void dbg_printSet1(ccRBTree_t* set, int* idx, ccRBTreeNode_t* node, void (*print
 void dbg_printSet(ccRBTree_t* set, void (*printData)(void*))
 {
     ccRBTreeNode_t* node = set->head;
-    int idx = 0;
-    int* idxp = &idx;
 
-    dbg_printSet1(set, idxp, node, printData);
+    dbg_printSet1(set, node, printData);
 
     return;
 }
