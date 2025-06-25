@@ -11,7 +11,6 @@ ccLogLevel_t activeLogLevel = ccLogLevels_Debug;
 #define PRINTBUFFERLEN 4096
 char printBuffer[PRINTBUFFERLEN];
 
-// todo: test vsnprintf fail path
 void ccLog(ccLogLevel_t level, const char* file, const char* function, const char *fmt, ...)
 {
     size_t size;

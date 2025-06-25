@@ -32,6 +32,7 @@ endef
 all: 
 	$(MAKE) cclog
 	$(MAKE) ccstd
+	$(MAKE) ccdebug
 	$(MAKE) test
 
 .PHONY: cclog
@@ -40,6 +41,10 @@ cclog:
 
 .PHONY: ccstd
 ccstd:
+	${RULE_TEXT}
+
+.PHONY: ccdebug
+ccdebug:
 	${RULE_TEXT}
 
 .PHONY: test
