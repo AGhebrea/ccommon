@@ -27,9 +27,9 @@
 
 #ifndef ccLogTrace
 #ifdef __GNUC__
-#define ccLogTrace() ccLog(ccLogLevels_Trace, __FILE__, __func__, "")
+#define ccLogTrace(str, ...) ccLog(ccLogLevels_Trace, __FILE__, __func__, str __VA_OPT__(,) __VA_ARGS__)
 #else
-#define ccLogTrace() ccLog(ccLogLevels_Trace, "", "", "")
+#define ccLogTrace(str) ccLog(ccLogLevels_Trace, "", "", str)
 #endif // __GNUC__
 #endif // ccLogTrace
 

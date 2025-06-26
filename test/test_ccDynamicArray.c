@@ -3,7 +3,7 @@
 
 int ccstd_ccDynamicArray_smoketest()
 {
-    ccLogTrace();
+    ccLogTrace("");
 
     size_t tmp = 0;
 

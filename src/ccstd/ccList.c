@@ -271,7 +271,7 @@ void ccList_deleteHead(ccList_t* list)
 {
     ccListNode_t* tmp;
 
-    ccLogTrace();
+    ccLogTrace("");
 
     list->last = NULL;
 

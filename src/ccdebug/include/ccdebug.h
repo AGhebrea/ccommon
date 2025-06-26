@@ -4,9 +4,8 @@
  * and that is the same as just calling ccLogTrace by hand */
 
 #ifdef DEBUG
-#define DebugEnabledExpression(expr) \
-    { expr }
+#define DebugEnabled(expr) \
+    expr
 #else 
-#define DebugEnabledExpression(expr) \
-    (void)0
+#define DebugEnabled(expr)
 #endif /* DEBUG */
